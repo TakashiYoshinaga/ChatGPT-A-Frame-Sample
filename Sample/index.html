@@ -1,0 +1,69 @@
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script type~"text/javascript">
+     async function sendPrompt(prompt = '') {
+        console.log("hogehoge");
+	let API_KEY = ' '
+
+	// promptがない場合
+	if (!prompt) return
+
+	const response = await fetch('https://api.openai.com/v1/chat/completions', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${API_KEY}`,
+		},
+		body: JSON.stringify({
+  model: "gpt-3.5-turbo",
+  //messages: [{role: "system", content: "あなたは要求された内容を実現するA-FrameのPrimitiveのHTMLタグのみを回答します。<a-scene>不要。HTMLのコードブロック(```html ＋ 回答```)形式"},{role: "user", content: "A-Frameで青くてアニメーションで自転するboxを目の前に表示するタグ"}],
+    //messages: [{role: "system", content: "あなたは要求された内容を実現するため、A-FrameのPrimitiveなHTMLタグのみを提供します。<a-scene>不要。回答はHTMLのコードブロック形式"},{role: "user", content: "x方向に3個、z方向に3個、合計9個で色はランダム、大きさは0.5のboxをカメラの前に配置するタグ。各boxはanimationで自転"}],
+      messages: [{role: "system", content: "あなたは要求された内容を実現するため、A-FrameのPrimitiveなHTMLタグのみをコードブロックで提供します。<a-scene>不要。"},{role: "user", content: "花を作って"}],
+}),
+	})
+
+	const data = await response.json()
+    var text=data.choices[0].message.content;
+	console.log(text)
+    const regex = /```(?:html)?\n([\s\S]*?)\n```/;
+const match = regex.exec(text);
+console.log(match);
+const htmlTag = match[1];
+
+console.log(htmlTag);
+if(!htmlTag) return;
+const container = document.getElementById('container');
+const aFrameTag = document.createElement('div');
+aFrameTag.innerHTML = htmlTag.trim();
+//container.appendChild(aFrameTag.firstChild);
+//boxWrapper.innerHTML = boxString.trim();
+while (aFrameTag.firstChild) {
+  container.appendChild(aFrameTag.firstChild);
+}
+}
+
+let prompt = 'hogehoge';
+sendPrompt(prompt);
+function addBox() {}
+
+
+    </script>
+  </head>
+  <body>
+   <!-- <textarea id="input" rows="4" cols="50"></textarea>
+    <button onclick="addBox()">Add Box</button>-->
+    <a-scene>
+        <a-entity id="container"></a-entity>
+      <!--<a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+      <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+      <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>-->
+      <a-sky color="#ECECEC"></a-sky>
+    </a-scene>
+    <div style="position: absolute; bottom: 0; left: 0; width: 100%">
+        <textarea style="width: 20%; height: 200px"></textarea>
+        <button style="display: block; margin: 0 auto">Submit</button>
+      </div>
+  </body>
+</html>
