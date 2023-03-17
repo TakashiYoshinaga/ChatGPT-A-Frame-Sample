@@ -17,27 +17,25 @@
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
-          //messages: [{role: "system", content: "あなたは要求された内容を実現するA-FrameのPrimitiveのHTMLタグのみを回答します。<a-scene>不要。HTMLのコードブロック(```html ＋ 回答```)形式"},{role: "user", content: "A-Frameで青くてアニメーションで自転するboxを目の前に表示するタグ"}],
-          //messages: [{role: "system", content: "あなたは要求された内容を実現するため、A-FrameのPrimitiveなHTMLタグのみを提供します。<a-scene>不要。回答はHTMLのコードブロック形式"},{role: "user", content: "x方向に3個、z方向に3個、合計9個で色はランダム、大きさは0.5のboxをカメラの前に配置するタグ。各boxはanimationで自転"}],
-          //messages: [{role: "system", content: "あなたは要求された内容を実現するため、A-FrameのPrimitiveなHTMLタグのみを提供します。<a-scene>不要。回答はHTMLのコードブロック形式"},{role: "user", content: prompt}],
-          messages: [{role: "system", content: "あなたはA-FrameのPrimitive ElementのHTMLタグを提供します。"},{role: "user", content: prompt+" A-FrameのPrimitive ElementのHTMLタグのみをコードブロックで提供。<a-scene>は含まない。"}],
+          messages: [{role: "system", content: "あなたはA-FrameのPrimitive ElementのHTMLタグをコードブロックで提供します。"},{role: "user", content: prompt+" これらのオブジェクトのPrimitive ElementのHTMLタグを提供。<a-scene>は含まない。"}], 
+          temperature:0.5,
         }),
       });
       
       const data = await response.json();
       var text=data.choices[0].message.content;
+      console.log(data)
       console.log(text)
-      const regex = /```(?:html)?\n([\s\S]*?)\n```/;
-      const match = regex.exec(text);
-      console.log(match);
-      if(match==null) return;
-      const htmlTag = match[1];
-//      if(!htmlTag) return;
-      console.log(htmlTag);
-      const container = document.getElementById('container');
+      const regex = /```(?:html)?\n([\s\S]*?)\n```/g;
+      let match;
       const aFrameTag = document.createElement('div');
-      aFrameTag.innerHTML = htmlTag.trim();
-      
+      const container = document.getElementById('container');
+      while ((match = regex.exec(text)) !== null) {
+        const htmlTag = match[1];
+        console.log(htmlTag);
+        // a-frameのタグを生成する処理
+        aFrameTag.innerHTML += htmlTag.trim();
+      }
       // container要素の子要素を削除
       while (container.firstChild) {
         container.removeChild(container.firstChild);
