@@ -4,9 +4,10 @@
     <script type="text/javascript">
     async function sendPrompt(prompt = '') {
       let API_KEY = ''
-      
+      let output=document.getElementById('output');
+      output.value="Wait...";
       // promptがない場合
-      if (!prompt) return
+      if (!prompt){output.value="プロンプトを入力してください"; return};
       
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -24,7 +25,7 @@
       const data = await response.json();
       var text=data.choices[0].message.content;
       console.log(data)
-      console.log(text)
+      output.value=text+"\n\n";
       const regex = /```(?:html)?\n([\s\S]*?)\n```/g;
       
       const aFrameTag = document.createElement('div');
@@ -33,37 +34,28 @@
       while (container.firstChild) {
         container.removeChild(container.firstChild);
       }
-      
+      output.value+="[結果]\n";
       text.replace(regex, (match, htmlTag) => {
         console.log("code block: "+match);
         console.log("result: "+htmlTag);
+        output.value+=htmlTag+"\n";
         const aFrameTag = document.createElement('div');
         aFrameTag.innerHTML = htmlTag.trim();
         while (aFrameTag.firstChild) {
           container.appendChild(aFrameTag.firstChild);
         }
       });
-
+      
       if (!text.match(regex)) {
         console.log('No match found.');
+        output.value+='No match found.';
         // ここにマッチしなかった場合の処理を記述
       }
-
-      // while ((match = regex.exec(text)) !== null) {
-      //   const htmlTag = match[1];
-      //   console.log(htmlTag);
-      //   // a-frameのタグを生成する処理
-      //   aFrameTag.innerHTML += htmlTag.trim();
-      // }
-      
-      // while (aFrameTag.firstChild) {
-      //   container.appendChild(aFrameTag.firstChild);
-      // }
     }
     
     function addBox() {
       //get text from textarea
-      let prompt = document.querySelector('textarea').value;
+      let prompt = document.getElementById('input').value;//document.querySelector('textarea').value;
       sendPrompt(prompt);
     }
     </script>
@@ -74,8 +66,9 @@
       <a-sky color="#ECECEC"></a-sky>
     </a-scene>
     <div style="position: fixed; top: 20px; left: 20px; width: 20%;">
-      <textarea style="font-size: 20px; width: 100%; height: 300px;"></textarea>
-      <button onclick="addBox()" style="display: block; margin-top: 20px;width: 100%; height: 50px;">Submit</button>
+      <textarea id="input" style="font-size: 20px; width: 100%; height: 250px;"></textarea>
+      <button onclick="addBox()" style="display: block; margin: 10px 0; width: 100%; height: 50px;">Submit</button>
+      <textarea id="output" style="font-size: 18px; width: 100%; height: 250px;"></textarea>
     </div>
   </body>
 </html>
