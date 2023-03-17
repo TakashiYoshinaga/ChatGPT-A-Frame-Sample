@@ -3,7 +3,6 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script type="text/javascript">
     async function sendPrompt(prompt = '') {
-      console.log("hogehoge");
       let API_KEY = ''
       
       // promptがない場合
@@ -17,7 +16,7 @@
         },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
-          messages: [{role: "system", content: "あなたはA-FrameのPrimitive ElementのHTMLタグをコードブロックで提供します。"},{role: "user", content: prompt+" これらのオブジェクトのPrimitive ElementのHTMLタグを提供。<a-scene>は含まない。"}], 
+          messages: [{role: "system", content: "あなたはA-FrameのPrimitive ElementのHTMLタグを提供します。"},{role: "user", content: prompt+"¥n上記のオブジェクトのPrimitive ElementのHTMLタグをコードブロックで提供。ただし<a-scene>は含まない。"}], 
           temperature:0.5,
         }),
       });
