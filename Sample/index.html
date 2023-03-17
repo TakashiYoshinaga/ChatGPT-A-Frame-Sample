@@ -27,23 +27,39 @@
       console.log(data)
       console.log(text)
       const regex = /```(?:html)?\n([\s\S]*?)\n```/g;
-      let match;
+      
       const aFrameTag = document.createElement('div');
       const container = document.getElementById('container');
-      while ((match = regex.exec(text)) !== null) {
-        const htmlTag = match[1];
-        console.log(htmlTag);
-        // a-frameのタグを生成する処理
-        aFrameTag.innerHTML += htmlTag.trim();
-      }
       // container要素の子要素を削除
       while (container.firstChild) {
         container.removeChild(container.firstChild);
       }
       
-      while (aFrameTag.firstChild) {
-        container.appendChild(aFrameTag.firstChild);
+      text.replace(regex, (match, htmlTag) => {
+        console.log("code block: "+match);
+        console.log("result: "+htmlTag);
+        const aFrameTag = document.createElement('div');
+        aFrameTag.innerHTML = htmlTag.trim();
+        while (aFrameTag.firstChild) {
+          container.appendChild(aFrameTag.firstChild);
+        }
+      });
+
+      if (!text.match(regex)) {
+        console.log('No match found.');
+        // ここにマッチしなかった場合の処理を記述
       }
+
+      // while ((match = regex.exec(text)) !== null) {
+      //   const htmlTag = match[1];
+      //   console.log(htmlTag);
+      //   // a-frameのタグを生成する処理
+      //   aFrameTag.innerHTML += htmlTag.trim();
+      // }
+      
+      // while (aFrameTag.firstChild) {
+      //   container.appendChild(aFrameTag.firstChild);
+      // }
     }
     
     function addBox() {
