@@ -5,14 +5,17 @@
       let API_KEY = '';
       let container;
       let output;
+      let messagesArray;
       window.onload=function(){
         container = document.getElementById('container');
         output=document.getElementById('output');
+        messagesArray=[{role: "system", content: "あなたはA-FrameのPrimitive Elementを教えるエージェントです。"},{role: "user", content: "今日はよろしくお願いします。"}];
+        sendPrompt();
       }
       
       async function sendPrompt(prompt = '') {
         //promptがない場合
-        if (!prompt){output.value="プロンプトを入力してください"; return};
+        //if (!prompt){output.value="プロンプトを入力してください"; return};
         //promptがある場合はリクエストを送信
         const response = await fetch('https://api.openai.com/v1/chat/completions', 
           {
@@ -23,10 +26,8 @@
             },
             body: JSON.stringify({
               model: "gpt-3.5-turbo",
-              messages: [
-                {role: "system", content: "あなたはA-FrameのPrimitive ElementのHTMLタグを提供します。"},
-                {role: "user", content: prompt+"¥n上記のオブジェクトのPrimitive ElementのHTMLタグをコードブロックで提供。ただし<a-scene>は含まない。"}], 
-                temperature:0.5,
+              messages: messagesArray, 
+              temperature:0.7,
               }
             ),
           }
@@ -36,41 +37,51 @@
       //ChatGPTからの回答をテキストで取得
       var text=data.choices[0].message.content;
       output.value=(text+"\n\n");
+      return text;
+    }
+    function useResult(text){
+      // container要素の子要素を削除
+       while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+      
       //結果を表示する準備
-      output.value+="[結果]\n";
+      output.value+="[処理結果]\n";
+    
+      // <a-scene> と </a-scene> タグの間の内容、または全体の内容を抽出する正規表現
+      const regex = /```(?:html)?\n(?:<a-scene>)?([\s\S]*?)(?:<\/a-scene>)?\n```/g;
+      // コンテンツが見つかったかどうかを追跡する変数
+      let foundContent = false;
 
-      //正規表現でコードブロックを抽出
-      const regex = /```(?:html)?\n([\s\S]*?)\n```/g;
-      text.replace(regex, (match, htmlTag) => {
-        //console.log("code block: "+match);
-        //console.log("result: "+htmlTag);
-        //コードブロック内のHTMLタグを表示
-        output.value+=htmlTag+"\n";
-        //コードブロック内のHTMLタグを空のdiv要素に追加
+      // コードブロック内のHTMLタグを処理する
+      text.replace(regex, (match, contentToProcess) => {
+        foundContent = true;
+        // コードブロック内のHTMLタグを表示
+        output.value += contentToProcess + "\n";
+        // コードブロック内のHTMLタグを空のdiv要素に追加
         const elements = document.createElement('div');
-        elements.innerHTML = htmlTag.trim();
-        //各要素(オブジェクト)をcontainerに移動
+        elements.innerHTML = contentToProcess.trim();
+        // 各要素（オブジェクト）をcontainerに移動
         while (elements.firstChild) {
           container.appendChild(elements.firstChild);
         }
       });
-      //適切なHTMLタグが見つからなかった場合
-      if (!text.match(regex)) {
-        output.value+='No A-Frame primitive element found.';
-      }
+
+      // 適切なHTMLタグが見つからなかった場合
+      if (!foundContent) {
+        // A-Frameのプリミティブ要素が見つからない旨のメッセージを表示
+        output.value += 'No A-Frame primitive element found.\n';
+      }   
     }
-    function reset(){
-      // container要素の子要素を削除
-      while (container.firstChild) {
-        container.removeChild(container.firstChild);
-      }
+    async function onClick() {
       output.value="Wait...";
-    }
-    function onClick() {
-      reset();
       //get text from textarea
       let prompt = document.getElementById('input').value;
-      sendPrompt(prompt);
+      //promptがない場合
+      if (!prompt){output.value="プロンプトを入力してください"; return};
+      messagesArray[1]={role: "user", content: prompt+"\n 結果はコードブロックで提供。"};
+      let result = await sendPrompt(prompt);
+      useResult(result);
     }
     </script>
   </head>
