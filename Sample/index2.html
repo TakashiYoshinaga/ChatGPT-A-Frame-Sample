@@ -11,7 +11,7 @@
         container = document.getElementById('container');
         output=document.getElementById('output');
         messagesArray=[{role: "system", content: "あなたはA-FrameのPrimitive Elementの教えるエージェントです。"}];
-        sendPrompt("今日は指示内容を実現するA-FrameのPrimitive ElementのHTMLタグをコードブロックで提供。追加の指示の場合は現在のオブジェクトもコードブロックに記述。");
+        sendPrompt("今日は指示内容を実現するA-FrameのPrimitive ElementのHTMLタグのみをコードブロックで提供。追加の指示の場合は現在のオブジェクトや背景もコードブロックに記述。背景の変更を指示した場合はa-skyを使用。");
       }
       
       async function sendPrompt(prompt = '') {
@@ -96,7 +96,7 @@
   <body>
     <a-scene>
       <a-entity id="container"></a-entity>
-      <a-sky color="#ECECEC"></a-sky>
+      <!--<a-sky color="#ECECEC"></a-sky>-->
     </a-scene>
     <div style="position: fixed; top: 20px; left: 20px; width: 20%;">
       <textarea id="input" style="font-size: 20px; width: 100%; height: 250px;"></textarea>
