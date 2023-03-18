@@ -79,7 +79,7 @@
       let prompt = document.getElementById('input').value;
       //promptがない場合
       if (!prompt){output.value="プロンプトを入力してください"; return};
-      messagesArray[1]={role: "user", content: prompt+"\n 結果はコードブロックで提供。"};
+      messagesArray[1]={role: "user", content: prompt+"\n 上記を実現するA-FrameのPrimitive ElementのHTMLタグをコードブロックで提供"};
       let result = await sendPrompt(prompt);
       useResult(result);
     }
