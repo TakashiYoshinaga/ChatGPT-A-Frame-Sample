@@ -11,7 +11,7 @@
         container = document.getElementById('container');
         output=document.getElementById('output');
         messagesArray=[{role: "system", content: "あなたはA-FrameのPrimitive Elementの教えるエージェントです。"}];
-        sendPrompt("今日は指示内容を実現するA-FrameのPrimitive ElementのHTMLタグのみをコードブロックで提供。追加の指示の場合は現在のオブジェクトや背景もコードブロックに記述。背景の変更を指示した場合はa-skyを使用。");
+        sendPrompt("今日は指示内容を実現するA-FrameのPrimitive ElementのHTMLタグをコードブロックで提供。HTMLのソース全体は不要。追加の指示の場合は現在のオブジェクトや背景もコードブロックに記述。背景の変更を指示した場合はa-skyを使用。");
       }
       
       async function sendPrompt(prompt = '') {
@@ -29,7 +29,7 @@
           body: JSON.stringify({
             model: "gpt-3.5-turbo",
             messages: messagesArray, 
-            temperature:0.7,
+            temperature:0.5,
           }),
         });
         console.log(messagesArray);

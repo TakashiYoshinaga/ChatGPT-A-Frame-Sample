@@ -27,7 +27,7 @@
             body: JSON.stringify({
               model: "gpt-3.5-turbo",
               messages: messagesArray, 
-              temperature:0.7,
+              temperature:0.5,
               }
             ),
           }
@@ -79,7 +79,7 @@
       let prompt = document.getElementById('input').value;
       //promptがない場合
       if (!prompt){output.value="プロンプトを入力してください"; return};
-      messagesArray[1]={role: "user", content: prompt+"\n 上記を実現するA-FrameのPrimitive ElementのHTMLタグのみをコードブロックに記述。背景の変更を指示した場合はa-skyを使用。"};
+      messagesArray[1]={role: "user", content: prompt+"\n 上記を実現するA-FrameのPrimitive ElementのHTMLタグをコードブロックに記述。HTMLのソース全体は不要。背景の変更を指示した場合はa-skyを使用。"};
       let result = await sendPrompt(prompt);
       useResult(result);
     }
