@@ -87,35 +87,33 @@
           const match2 = sceneContentRegex.exec(codeBlockContent);
           if (match2) {
             const sceneContent = match2[1];
-            console.log("a-scene内\n" + sceneContent);
-            // コードブロック内のHTMLタグを表示
-            //output.value += sceneContent + "\n";
-            // containerに各要素を追加
-            const elements = document.createElement('div');
-            elements.innerHTML = sceneContent.trim();
-            while (elements.firstChild) {
-              container.appendChild(elements.firstChild);
-            }
+            processSceneContent(sceneContent);
           } else {
             const fallbackRegex = /<a-[\w-]+[\s\S]*?(?:\/>|<\/a-[\w-]+>)/g;
             const matches = codeBlockContent.match(fallbackRegex);
             console.log("ma\n" + matches);
+            // A-Frame のプリミティブ要素が見つかった場合
             if (matches) {
               const sceneContent = matches.join("\n");
-              console.log("タグのみ\n" + sceneContent);
-              //output.value += sceneContent + "\n";
-              // containerに各要素を追加
-              const elements = document.createElement('div');
-              elements.innerHTML = sceneContent.trim();
-              while (elements.firstChild) {
-                container.appendChild(elements.firstChild);
-              }
-            } else {
+              processSceneContent(sceneContent);
+            }
+            // A-Frame のプリミティブ要素が見つからなかった場合
+            else {
               output.value += 'No A-Frame primitive element found.\n';
             }
           }
-        }    
+        }       
       }
+      function processSceneContent(sceneContent) {
+        console.log("タグ\n" + sceneContent);
+        output.value += sceneContent + "\n";
+        // containerに各要素を追加
+        const elements = document.createElement('div');
+        elements.innerHTML = sceneContent.trim();
+        while (elements.firstChild) {
+          container.appendChild(elements.firstChild);
+        }
+      }      
       async function onClick() {
         output.value="Wait...";
         //get text from textarea
