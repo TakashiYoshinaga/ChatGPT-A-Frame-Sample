@@ -27,7 +27,7 @@
             body: JSON.stringify({
               model: "gpt-3.5-turbo",
               messages: messagesArray, 
-              temperature:0.5,
+              temperature:0.3,
               }
             ),
           }
@@ -81,7 +81,17 @@
       if (!prompt){output.value="プロンプトを入力してください"; return};
       messagesArray[1]={role: "user", content: prompt+"\n <!DOCTYPE html>,<html>,<head>,<body>,<script>を絶対に使用しない。a-から始まるタグのみ使用可能。ただしa-cameraとa-assetsは使用しない。背景を変更する場合はa-skyを使用。結果はコードブロックに記述。"};
       let result = await sendPrompt(prompt);
-      useResult(result);
+      if(result.includes("<html>")){
+        output.value="Wait...";
+          console.log("html が含まれたためやり直し");
+          result = await sendPrompt(result+"¥この結果では<!DOCTYPE html>,<html>,<head>,<body>,<script>が使われてしまっています。"+prompt);
+          useResult(result);
+        }
+        else
+        {
+          useResult(result);
+        }
+     
     }
     </script>
   </head>

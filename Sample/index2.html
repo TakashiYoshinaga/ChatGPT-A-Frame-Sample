@@ -29,7 +29,7 @@
           body: JSON.stringify({
             model: "gpt-3.5-turbo",
             messages: messagesArray, 
-            temperature:0.5,
+            temperature:0.3,
           }),
         });
         console.log(messagesArray);
@@ -89,7 +89,16 @@
         //get text from textarea
         let prompt = document.getElementById('input').value;
         let result = await sendPrompt(prompt + "\n <!DOCTYPE html>,<html>,<head>,<body>,<script>を絶対に使用しない。a-から始まるタグのみ使用可能。ただしa-cameraとa-assetsは使用しない。背景を変更する場合はa-skyを使用。結果はコードブロックに記述。");
-        useResult(result);
+        if(result.includes("<html>")){
+          output.value="Wait...";
+          console.log("html が含まれたためやり直し");
+          result = await sendPrompt("<!DOCTYPE html>,<html>,<head>,<body>,<script>は使わないでください。");
+          useResult(result);
+        }
+        else
+        {
+          useResult(result);
+        }
       }
     </script>
   </head>
