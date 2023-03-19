@@ -107,15 +107,16 @@
         let prompt = document.getElementById('input').value;
         let result = await sendPrompt(prompt+"\n <!DOCTYPE html>,<html>,<head>,<body>,<script>を絶対に使用しない。a-から始まるタグのみ使用可能。ただしa-cameraとa-assetsは使用しない。背景を変更する場合はa-skyを使用。結果はコードブロックに記述。");
         console.log(result);
-          if(result.includes("<html>")){
+        if(result.includes("<html>")){
           console.log("html が含まれたためやり直し");
           output.value="Wait...";
           result = await sendPrompt("<!DOCTYPE html>,<html>,<head>,<body>,<script>は使わないでください。");
-          useResult(result);
         }
-        else
+        if(!result.includes("<html>"))
         {
           useResult(result);
+        }else{
+          output.value="コード生成失敗。再度指示してください。";
         }
       }
     </script>

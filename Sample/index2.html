@@ -95,9 +95,11 @@
           result = await sendPrompt("<!DOCTYPE html>,<html>,<head>,<body>,<script>は使わないでください。");
           useResult(result);
         }
-        else
+        if(!result.includes("<html>"))
         {
           useResult(result);
+        }else{
+          output.value="コード生成失敗。再度指示してください。";
         }
       }
     </script>
