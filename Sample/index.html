@@ -9,7 +9,7 @@
       window.onload=function(){
         container = document.getElementById('container');
         output=document.getElementById('output');
-        messagesArray=[{role: "system", content: "あなたはA-FrameのPrimitive Elementを教えるエージェントです。"},{role: "user", content: "今日はよろしくお願いします。"}];
+        messagesArray=[{role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるエージェントです。"},{role: "user", content: "今日はよろしくお願いします。"}];
         sendPrompt();
       }
       
@@ -79,7 +79,7 @@
       let prompt = document.getElementById('input').value;
       //promptがない場合
       if (!prompt){output.value="プロンプトを入力してください"; return};
-      messagesArray[1]={role: "user", content: prompt+"\n 上記を実現するA-FrameのPrimitive ElementのHTMLタグをコードブロックに記述。HTMLのソース全体は不要。背景の変更を指示した場合はa-skyを使用。"};
+      messagesArray[1]={role: "user", content: prompt+"\n <!DOCTYPE html>,<html>,<head>,<body>,<script>を絶対に使用しない。a-から始まるタグのみ使用可能。ただしa-cameraとa-assetsは使用しない。背景を変更する場合はa-skyを使用。結果はコードブロックに記述。"};
       let result = await sendPrompt(prompt);
       useResult(result);
     }

@@ -11,8 +11,8 @@
       window.onload=function(){
         container = document.getElementById('container');
         output=document.getElementById('output');
-        messagesArray=[{role: "system", content: "あなたはA-FrameのPrimitive Elementの教えるエージェントです。"}];
-        sendPrompt("今日は指示内容を実現するA-FrameのPrimitive ElementのHTMLタグをコードブロックで提供。HTMLのソース全体は不要。削除の指示がないオブジェクトや背景の情報をそのままコードブロックに記述。背景の変更を指示した場合はa-skyを使用。");
+        messagesArray=[{role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるエージェントです。"}];
+        //sendPrompt("今日は指示内容を実現するA-FrameのPrimitive ElementのHTMLタグをコードブロックで提供。HTMLのソース全体は不要。削除の指示がないオブジェクトや背景の情報をそのままコードブロックに記述。背景の変更を指示した場合はa-skyを使用。");
 
         const myImageGroup = document.getElementById("image-group");
         let imageVisible = false;
@@ -60,7 +60,7 @@
         //messagesArrayの要素数が7を超えたら、2番目と3番目の要素を削除
         console.log(messagesArray.length);
         if(messagesArray.length>11){ 
-          messagesArray.splice(3,2);
+          messagesArray.splice(1,2);
         }
         return text;
       }
@@ -105,7 +105,7 @@
         output.value="Wait...";
         //get text from textarea
         let prompt = document.getElementById('input').value;
-        let result = await sendPrompt(prompt);
+        let result = await sendPrompt(prompt+"\n <!DOCTYPE html>,<html>,<head>,<body>,<script>を絶対に使用しない。a-から始まるタグのみ使用可能。ただしa-cameraとa-assetsは使用しない。背景を変更する場合はa-skyを使用。結果はコードブロックに記述。");
         useResult(result);
       }
     </script>
