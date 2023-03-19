@@ -1,5 +1,6 @@
 <html>
   <head>
+    <meta charset="UTF-8">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://libs.zappar.com/zappar-aframe/2.0.1/zappar-aframe.js"></script>
     <script type="text/javascript">
@@ -11,6 +12,7 @@
       window.onload=function(){
         container = document.getElementById('container');
         output=document.getElementById('output');
+        output.value="上のTextAreaに指示を入力してください";
         messagesArray=[{role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるエージェントです。"}];
         //sendPrompt("今日は指示内容を実現するA-FrameのPrimitive ElementのHTMLタグをコードブロックで提供。HTMLのソース全体は不要。削除の指示がないオブジェクトや背景の情報をそのままコードブロックに記述。背景の変更を指示した場合はa-skyを使用。");
 
