@@ -40,8 +40,8 @@
       return text;
     }
     function useResult(text){
-      // container要素の子要素を削除
-       while (container.firstChild) {
+      //container要素の子要素を削除
+      while (container.firstChild) {
         container.removeChild(container.firstChild);
       }
       
@@ -49,29 +49,45 @@
       output.value+="[処理結果]\n";
     
       // <a-scene> と </a-scene> タグの間の内容、または全体の内容を抽出する正規表現
-      const regex = /```(?:html)?\n(?:<a-scene>)?([\s\S]*?)(?:<\/a-scene>)?\n```/g;
-      // コンテンツが見つかったかどうかを追跡する変数
-      let foundContent = false;
-
-      // コードブロック内のHTMLタグを処理する
-      text.replace(regex, (match, contentToProcess) => {
-        foundContent = true;
-        // コードブロック内のHTMLタグを表示
-        output.value += contentToProcess + "\n";
-        // コードブロック内のHTMLタグを空のdiv要素に追加
-        const elements = document.createElement('div');
-        elements.innerHTML = contentToProcess.trim();
-        // 各要素（オブジェクト）をcontainerに移動
-        while (elements.firstChild) {
-          container.appendChild(elements.firstChild);
+      //const regex = /```(?:html)?\n(?:<a-scene>)?([\s\S]*?)(?:<\/a-scene>)?\n```/g;
+      const regex = /```(?:html)?\s*([\s\S]*?)```/g;
+      let match;
+      while ((match = regex.exec(text)) !== null) {
+        const codeBlockContent = match[1];
+        console.log("コードブロック内\n" + codeBlockContent);
+        const sceneContentRegex = /<a-scene[^>]*>([\s\S]*?)<\/a-scene>/;
+        const match2 = sceneContentRegex.exec(codeBlockContent);
+        if (match2) {
+          const sceneContent = match2[1];
+          console.log("a-scene内\n" + sceneContent);
+          // コードブロック内のHTMLタグを表示
+          output.value += sceneContent + "\n";
+          // containerに各要素を追加
+          const elements = document.createElement('div');
+          elements.innerHTML = sceneContent.trim();
+          while (elements.firstChild) {
+            container.appendChild(elements.firstChild);
+          }
+        } else {
+          const fallbackRegex = /<a-[\w-]+[\s\S]*?(?:\/>|<\/a-[\w-]+>)/g;
+          const matches = codeBlockContent.match(fallbackRegex);
+          console.log("ma\n" + matches);
+          if (matches) {
+            const sceneContent = matches.join("\n");
+            console.log("タグのみ\n" + sceneContent);
+            output.value += sceneContent + "\n";
+            // containerに各要素を追加
+            const elements = document.createElement('div');
+            elements.innerHTML = sceneContent.trim();
+            while (elements.firstChild) {
+              container.appendChild(elements.firstChild);
+            }
+          } else {
+            output.value += 'No A-Frame primitive element found.\n';
+          }
         }
-      });
-
-      // 適切なHTMLタグが見つからなかった場合
-      if (!foundContent) {
-        // A-Frameのプリミティブ要素が見つからない旨のメッセージを表示
-        output.value += 'No A-Frame primitive element found.\n';
-      }   
+      }
+       
     }
     async function onClick() {
       output.value="Wait...";
@@ -79,22 +95,11 @@
       let prompt = document.getElementById('input').value;
       //promptがない場合
       if (!prompt){output.value="プロンプトを入力してください"; return};
-      prompt+="\n <!DOCTYPE html>,<html>,<head>,<body>,<script>を絶対に使用しない。a-から始まるタグのみ使用可能。ただしa-cameraとa-assetsは使用しない。背景を変更する場合はa-skyを使用。結果はコードブロックに記述。";
+      //prompt+="\n <!DOCTYPE html>,<html>,<head>,<body>,<script>を絶対に使用しない。a-から始まるタグのみ使用可能。ただしa-cameraとa-assetsは使用しない。背景を変更する場合はa-skyを使用。結果はコードブロックに記述。";
+      prompt+="\n 上記を実現するA-FrameのPrimitive Elementのタグを生成。ただしa-cameraとa-assetsは使用しない。結果はコードブロックに記述。";
       messagesArray[1]={role: "user", content: prompt};
       let result = await sendPrompt('');
-      if(result.includes("<html>")){
-        output.value="Wait...";
-          console.log("html が含まれたためやり直し");
-          messagesArray[1]={role: "user",content:result+"は期待した結果ではありません。。<!DOCTYPE html>,<html>,<head>,<body>,<script>を絶対に使わず以下を実現して。"+prompt};
-          result = await sendPrompt('');
-        }
-        if(!result.includes("<html>"))
-        {
-          useResult(result);
-        }else{
-          output.value="コード生成失敗。再度指示してください。\n"+result;
-        }
-     
+      useResult(result); 
     }
     </script>
   </head>
