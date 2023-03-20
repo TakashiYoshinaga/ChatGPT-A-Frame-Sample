@@ -56,7 +56,7 @@
         console.log(messageArray);
         //レスポンスを受け取ったら、結果をjsonで取得
         let data = await response.json();
-        if(!data.choices){messageArray.pop(); console.log("error"); return "";}
+        if(!data.choices){messageArray.pop(); outputText.value=("No Response"+"\n\n"); return "";}
         //ChatGPTからの回答をテキストで取得
         let text=data.choices[0].message.content;
         outputText.value=(text+"\n\n");
