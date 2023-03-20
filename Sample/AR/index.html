@@ -53,20 +53,27 @@
             temperature:0.3,
           }),
         });
-        console.log(messageArray);
         //レスポンスを受け取ったら、結果をjsonで取得
         let data = await response.json();
-        if(!data.choices){messageArray.pop(); outputText.value=("No Response"+"\n\n"); return "";}
-        //ChatGPTからの回答をテキストで取得
-        let text=data.choices[0].message.content;
-        outputText.value=(text+"\n\n");
-        //ChatGPTからの回答をmessagesArrayに追加
-        messageArray.push({role: "assistant", content: text});
-        //messagesArrayの要素数が7を超えたら、2番目と3番目の要素を削除
-        console.log(messageArray.length);
-        if(messageArray.length>11){ 
-          messageArray.splice(1,2);
+        let text;
+        //ChatGPTからの回答があればメッセージ履歴に追加
+        if(data.choices){
+          //ChatGPTからの回答をテキストで取得
+          text=data.choices[0].message.content;
+          //ChatGPTからの回答をmessagesArrayに追加
+          messageArray.push({role: "assistant", content: text});
+          //messagesArrayの要素数が11を超えたら、1番目と2番目の要素(0スタート)を削除
+          if(messageArray.length>11){ 
+            messageArray.splice(1,2);
+          }
+        }else{
+          text="No Response";
+          //ChatGPTからの回答がなければ、最後の要素を削除
+          messageArray.pop();
         }
+        //結果を表示
+        outputText.value=(text+"\n\n");
+        console.log(messageArray);
         return text;
       }
       //ChatGPTからの回答からA-Frameの要素を抽出

@@ -40,9 +40,13 @@
         );
       //レスポンスを受け取ったら、結果をjsonで取得
       let data = await response.json();
-      if(!data.choices){outputText.value=("No Response"+"\n\n");return "";}
-      //ChatGPTからの回答をテキストで取得
-      let text=data.choices[0].message.content;
+      let text;
+      if(data.choices){
+        //ChatGPTからの回答をテキストで取得
+        text=data.choices[0].message.content;
+      }else{
+        text="No Response";
+      }
       outputText.value=(text+"\n\n");
       return text;
     }

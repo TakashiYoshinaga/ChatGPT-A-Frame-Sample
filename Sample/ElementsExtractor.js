@@ -10,7 +10,7 @@ function FindAframeElements(text) {
         const matchScene = sceneContentRegex.exec(codeBlockContent);
         if (matchScene) {// <a-scene> と </a-scene> タグの間の内容が見つかった場合
             const sceneContent = matchScene[1];
-            processSceneContent(sceneContent,generatedElements );
+            ProcessSceneContent(sceneContent,generatedElements );
         } else {// <a-scene> と </a-scene> タグが見つからなかったけど<a-*>がある場合。
             const fallbackRegex = /<a-[\w-]+[\s\S]*?(?:\/>|<\/a-[\w-]+>)/g;
             const matches = codeBlockContent.match(fallbackRegex);
@@ -18,14 +18,14 @@ function FindAframeElements(text) {
             // A-Frame のプリミティブ要素が見つかった場合
             if (matches) {
                 const sceneContent = matches.join("\n");
-                processSceneContent(sceneContent,generatedElements);
+                ProcessSceneContent(sceneContent,generatedElements);
             }
         }   
     }
     return generatedElements;
 }
 
-function processSceneContent(sceneContent, generatedElements) {
+function ProcessSceneContent(sceneContent, generatedElements) {
     console.log("タグ\n" + sceneContent);
     // containerに各要素を追加
     const elements = document.createElement('div');
