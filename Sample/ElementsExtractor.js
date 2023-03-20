@@ -8,10 +8,10 @@ function FindAframeElements(text) {
         console.log("コードブロック内\n" + codeBlockContent);
         const sceneContentRegex = /<a-scene[^>]*>([\s\S]*?)<\/a-scene>/;
         const matchScene = sceneContentRegex.exec(codeBlockContent);
-        if (matchScene) {
+        if (matchScene) {// <a-scene> と </a-scene> タグの間の内容が見つかった場合
             const sceneContent = matchScene[1];
             processSceneContent(sceneContent,generatedElements );
-        } else {
+        } else {// <a-scene> と </a-scene> タグが見つからなかったけど<a-*>がある場合。
             const fallbackRegex = /<a-[\w-]+[\s\S]*?(?:\/>|<\/a-[\w-]+>)/g;
             const matches = codeBlockContent.match(fallbackRegex);
             console.log("matches\n" + matches);
