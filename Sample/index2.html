@@ -12,13 +12,13 @@
         elmContainer = document.getElementById('container');
         outputText=document.getElementById('output');
         messageArray=[
-          {role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるエージェントです。"}
+          {role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるアシスタントです。"}
         ];
       }
       //ChatGPTにメッセージを送信
       async function SendMessage() {
         //promptがある場合はリクエストを送信
-        const response = await fetch('https://api.openai.com/v1/chat/completions', 
+        let response = await fetch('https://api.openai.com/v1/chat/completions', 
         {
           method: 'POST',
           headers: {
@@ -33,9 +33,9 @@
         });
         console.log(messageArray);
         //レスポンスを受け取ったら、結果をjsonで取得
-        const data = await response.json();
+        let data = await response.json();
         //ChatGPTからの回答をテキストで取得
-        var text=data.choices[0].message.content;
+        let text=data.choices[0].message.content;
         outputText.value=(text+"\n\n");
         console.log(data.choices[0].message);
         //ChatGPTからの回答をmessagesArrayに追加
@@ -52,7 +52,7 @@
         //結果を表示する準備
         outputText.value+="[処理結果]\n";
         //textからA-Frameの要素を抽出
-        const generatedElements = FindAframeElements(text);
+        let generatedElements = FindAframeElements(text);
         //generatedElementsが空でなければcontainerに各要素を追加
         if(generatedElements.length>0){
           //containerから子要素を削除

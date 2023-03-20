@@ -14,10 +14,9 @@
         elmContainer = document.getElementById('container');
         outputText=document.getElementById('output');
         outputText.value="上のTextAreaに指示を入力してください";
-        messageArray=[{role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるエージェントです。"}];
-        //sendPrompt("今日は指示内容を実現するA-FrameのPrimitive ElementのHTMLタグをコードブロックで提供。HTMLのソース全体は不要。削除の指示がないオブジェクトや背景の情報をそのままコードブロックに記述。背景の変更を指示した場合はa-skyを使用。");
-
-        const myImageGroup = document.getElementById("image-group");
+        messageArray=[{role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるアシスタントです。"}];
+       
+        let myImageGroup = document.getElementById("image-group");
         let imageVisible = false;
         myImageGroup.addEventListener("zappar-visible", () => {
             // The image has appeared so show the group
@@ -36,7 +35,7 @@
       //ChatGPTにメッセージを送信
       async function SendMessage() {
         //promptがある場合はリクエストを送信
-        const response = await fetch('https://api.openai.com/v1/chat/completions', 
+        let response = await fetch('https://api.openai.com/v1/chat/completions', 
         {
           method: 'POST',
           headers: {
@@ -51,9 +50,9 @@
         });
         console.log(messageArray);
         //レスポンスを受け取ったら、結果をjsonで取得
-        const data = await response.json();
+        let data = await response.json();
         //ChatGPTからの回答をテキストで取得
-        var text=data.choices[0].message.content;
+        let text=data.choices[0].message.content;
         outputText.value=(text+"\n\n");
         //ChatGPTからの回答をmessagesArrayに追加
         messageArray.push({role: "assistant", content: text});
@@ -68,7 +67,7 @@
       function CreateElements(text){
         console.log("処理開始\n");
         //textからA-Frameの要素を抽出
-        const generatedElements = FindAframeElements(text);
+        let generatedElements = FindAframeElements(text);
         //generatedElementsが空でなければcontainerに各要素を追加
         if(generatedElements.length>0){
           //containerから子要素を削除
