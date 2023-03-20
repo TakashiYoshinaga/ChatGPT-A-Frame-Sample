@@ -8,7 +8,7 @@
       let container;
       let output;
       let messagesArray;
-      
+      let generatedElements;
       window.onload=function(){
         container = document.getElementById('container');
         output=document.getElementById('output');
@@ -68,10 +68,9 @@
       }
       
       function useResult(text){
-        // container要素の子要素を削除
-        while (container.firstChild) {
-          container.removeChild(container.firstChild);
-        }
+        console.log("処理開始\n");
+        //delete all items in generatedElements
+        generatedElements = [];
         
         //結果を表示する準備
         //output.value+="[処理結果]\n";
@@ -91,33 +90,40 @@
           } else {
             const fallbackRegex = /<a-[\w-]+[\s\S]*?(?:\/>|<\/a-[\w-]+>)/g;
             const matches = codeBlockContent.match(fallbackRegex);
-            console.log("ma\n" + matches);
+            console.log("matches\n" + matches);
             // A-Frame のプリミティブ要素が見つかった場合
             if (matches) {
               const sceneContent = matches.join("\n");
               processSceneContent(sceneContent);
             }
-            // A-Frame のプリミティブ要素が見つからなかった場合
-            else {
-              output.value += 'No A-Frame primitive element found.\n';
-            }
           }
+        }
+        //generatedElementsが空でなkればcontainerに各要素を追加
+        if(generatedElements.length>0){
+          //containerから子要素を削除
+          while (container.firstChild) {
+            container.removeChild(container.firstChild);
+          }
+          generatedElements.forEach(element => {
+            container.appendChild(element); 
+            output.value += element.outerHTML + "\n";
+          });
+        }else{
+          output.value += "No A-Frame primitive element found.\n";
         }       
       }
       function processSceneContent(sceneContent) {
         console.log("タグ\n" + sceneContent);
-        output.value += sceneContent + "\n";
         // containerに各要素を追加
         const elements = document.createElement('div');
         elements.innerHTML = sceneContent.trim();
         while (elements.firstChild) {
           if(elements.firstChild.outerHTML){
-            container.appendChild(elements.firstChild);
-          }else{
-            elements.removeChild(elements.firstChild);
+            generatedElements.push(elements.firstChild);
           }
+          elements.removeChild(elements.firstChild);
         }
-      }      
+      }    
       async function onClick() {
         output.value="Wait...";
         //get text from textarea
