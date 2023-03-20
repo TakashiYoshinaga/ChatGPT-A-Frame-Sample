@@ -4,23 +4,22 @@
     <script src="ElementsExtractor.js"></script>
     <script type="text/javascript">
       let API_KEY = '';
-      let container;
-      let output;
-      let messagesArray;
+      let elmContainer;
+      let outputText;
+      let messageArray;
 
       window.onload=function(){
-        container = document.getElementById('container');
-        output=document.getElementById('output');
-        messagesArray=[
+        elmContainer = document.getElementById('container');
+        outputText=document.getElementById('output');
+        messageArray=[
           {role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるエージェントです。"},
-          {role: "user", content: "今日はよろしくお願いします。"}];
-        sendPrompt();
+          {role: "user", content: "今日はよろしくお願いします。"}
+        ];
+        SendMessage();
       }
-      
-      async function sendPrompt() {
-        //promptがない場合
-        //if (!prompt){output.value="プロンプトを入力してください"; return};
-        //promptがある場合はリクエストを送信
+      //ChatGPTにメッセージを送信
+      async function SendMessage() {
+        //リクエストを送信
         const response = await fetch('https://api.openai.com/v1/chat/completions', 
           {
             method: 'POST',
@@ -30,7 +29,7 @@
             },
             body: JSON.stringify({
               model: "gpt-3.5-turbo",
-              messages: messagesArray, 
+              messages: messageArray, 
               temperature:0.3,
               }
             ),
@@ -40,54 +39,57 @@
       const data = await response.json();
       //ChatGPTからの回答をテキストで取得
       var text=data.choices[0].message.content;
-      output.value=(text+"\n\n");
+      outputText.value=(text+"\n\n");
       return text;
     }
-    function useResult(text){
+    //ChatGPTからの回答からA-Frameの要素を抽出
+    function CreateElements(text){
       console.log("処理開始\n");
       //結果を表示する準備
-      output.value+="[処理結果]\n";
-    
+      outputText.value+="[処理結果]\n";
+      //textからA-Frameの要素を抽出
       const generatedElements = FindAframeElements(text);
-
-      //generatedElementsが空でなkればcontainerに各要素を追加
+      //generatedElementsが空でなければcontainerに各要素を追加
       if(generatedElements.length>0){
         //containerから子要素を削除
-        while (container.firstChild) {
-          container.removeChild(container.firstChild);
+        while (elmContainer.firstChild) {
+          elmContainer.removeChild(elmContainer.firstChild);
         }
+        //containerに各要素を追加
         generatedElements.forEach(element => {
-          container.appendChild(element); 
-          output.value += element.outerHTML + "\n";
+          //elementをcontainerに追加
+          elmContainer.appendChild(element); 
+          //elementのタグをoutputTextに追加(表示用)
+          outputText.value += element.outerHTML + "\n";
         });
       }else{
-        output.value += "No A-Frame primitive element found.\n";
+        outputText.value += "No A-Frame primitive element found.\n";
       }
     }
-
-
-    async function onClick() {
-      output.value="Waiting...";
-      //get text from textarea
+    //ボタンが押されたら
+    async function OnClick() {
+      outputText.value="Waiting...";
+      //プロンプトをTexAreaから取得
       let prompt = document.getElementById('input').value;
       //promptがない場合
-      if (!prompt){output.value="プロンプトを入力してください"; return};
-      //prompt+="\n <!DOCTYPE html>,<html>,<head>,<body>,<script>を絶対に使用しない。a-から始まるタグのみ使用可能。ただしa-cameraとa-assetsは使用しない。背景を変更する場合はa-skyを使用。結果はコードブロックに記述。";
+      if (!prompt){outputText.value="プロンプトを入力してください"; return};
+      //プロンプトをmessageArrayに追加
       prompt+="\n 上記を実現するコードの中からaで始まるタグの行を抜き出して表示して。ただしa-camera,a-assets,a-animationは使用しない。結果はコードブロックに記述。";
-      messagesArray[1]={role: "user", content: prompt};
-      let result = await sendPrompt();
-      useResult(result); 
+      messageArray[1]={role: "user", content: prompt};
+      //ChatGPTにメッセージを送信
+      let result = await SendMessage();
+      //ChatGPTからの回答からA-Frameの要素を抽出
+      CreateElements(result); 
     }
     </script>
   </head>
   <body>
     <a-scene>
       <a-entity id="container"></a-entity>
-      <!--<a-sky color="#ECECEC"></a-sky>-->
     </a-scene>
     <div style="position: fixed; top: 20px; left: 20px; width: 20%;">
       <textarea id="input" style="font-size: 20px; width: 100%; height: 250px;"></textarea>
-      <button onclick="onClick()" style="display: block; margin: 10px 0; width: 100%; height: 50px;">Submit</button>
+      <button onclick="OnClick()" style="display: block; margin: 10px 0; width: 100%; height: 50px;">Submit</button>
       <textarea id="output" style="font-size: 18px; width: 100%; height: 250px;"></textarea>
     </div>
   </body>
