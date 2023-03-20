@@ -11,7 +11,9 @@
       window.onload=function(){
         container = document.getElementById('container');
         output=document.getElementById('output');
-        messagesArray=[{role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるエージェントです。"},{role: "user", content: "今日はよろしくお願いします。"}];
+        messagesArray=[
+          {role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるエージェントです。"},
+          {role: "user", content: "今日はよろしくお願いします。"}];
         sendPrompt();
       }
       
