@@ -1,12 +1,13 @@
 <html>
   <head>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="ElementsExtractor.js"></script>
     <script type="text/javascript">
       let API_KEY = '';
       let container;
       let output;
       let messagesArray;
-      let generatedElements;      
+     
       window.onload=function(){
         container = document.getElementById('container');
         output=document.getElementById('output');
@@ -38,10 +39,10 @@
         //ChatGPTからの回答をテキストで取得
         var text=data.choices[0].message.content;
         output.value=(text+"\n\n");
+        console.log(data.choices[0].message);
         //ChatGPTからの回答をmessagesArrayに追加
         messagesArray.push({role: "assistant", content: text});
         //messagesArrayの要素数が7を超えたら、2番目と3番目の要素を削除
-        console.log(messagesArray.length);
         if(messagesArray.length>7){ 
           messagesArray.splice(1,2);
         }
@@ -50,35 +51,12 @@
       
       function useResult(text){
         console.log("処理開始\n");
-        //delete all items in generatedElements
-        generatedElements = [];
         
         //結果を表示する準備
         output.value+="[処理結果]\n";
      
-      // <a-scene> と </a-scene> タグの間の内容、または全体の内容を抽出する正規表現
-      //const regex = /```(?:html)?\n(?:<a-scene>)?([\s\S]*?)(?:<\/a-scene>)?\n```/g;
-        const regex = /```(?:html)?\s*([\s\S]*?)```/g;
-        let match;
-        while ((match = regex.exec(text)) !== null) {
-          const codeBlockContent = match[1];
-          console.log("コードブロック内\n" + codeBlockContent);
-          const sceneContentRegex = /<a-scene[^>]*>([\s\S]*?)<\/a-scene>/;
-          const match2 = sceneContentRegex.exec(codeBlockContent);
-          if (match2) {
-            const sceneContent = match2[1];
-            processSceneContent(sceneContent);
-          } else {
-            const fallbackRegex = /<a-[\w-]+[\s\S]*?(?:\/>|<\/a-[\w-]+>)/g;
-            const matches = codeBlockContent.match(fallbackRegex);
-            console.log("matches\n" + matches);
-            // A-Frame のプリミティブ要素が見つかった場合
-            if (matches) {
-              const sceneContent = matches.join("\n");
-              processSceneContent(sceneContent);
-            }
-          }
-        }
+        const generatedElements = FindAframeElements(text);
+
         //generatedElementsが空でなkればcontainerに各要素を追加
         if(generatedElements.length>0){
           //containerから子要素を削除
@@ -93,20 +71,10 @@
           output.value += "No A-Frame primitive element found.\n";
         } 
       }
-      function processSceneContent(sceneContent) {
-        console.log("タグ\n" + sceneContent);
-        // containerに各要素を追加
-        const elements = document.createElement('div');
-        elements.innerHTML = sceneContent.trim();
-        while (elements.firstChild) {
-          if(elements.firstChild.outerHTML){
-            generatedElements.push(elements.firstChild);
-          }
-          elements.removeChild(elements.firstChild);
-        }
-      }
+      
+
       async function onClick() {
-        output.value="Wait...";
+        output.value="Waiting...";
         //get text from textarea
         let prompt = document.getElementById('input').value;
         //let result = await sendPrompt(prompt + "\n <!DOCTYPE html>,<html>,<head>,<body>,<script>を絶対に使用しない。a-から始まるタグのみ使用可能。ただしa-cameraとa-assetsは使用しない。背景を変更する場合はa-skyを使用。結果はコードブロックに記述。");
