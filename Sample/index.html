@@ -82,7 +82,7 @@
       //promptがない場合
       if (!prompt){outputText.value="プロンプトを入力してください"; return};
       //プロンプトをmessageArrayに追加
-      prompt+="\n 上記を実現する<a-scene> </a-scene>内の要素を生成。ただしa-camera,a-assets,a-animationは使用しない。結果はコードブロックに記述。";
+      prompt+="\n 上記を実現するA-Frameのa-から始まる要素を生成。ただしa-camera,a-assets,a-animationは使用しない。結果はコードブロックに記述。";
       messageArray[1]={role: "user", content: prompt};
       //ChatGPTにメッセージを送信
       let result = await SendMessage();
