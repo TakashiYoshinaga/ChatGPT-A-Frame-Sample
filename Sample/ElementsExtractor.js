@@ -26,7 +26,7 @@ function FindAframeElements(text) {
 }
 
 function ProcessSceneContent(sceneContent, generatedElements) {
-    console.log("タグ\n" + sceneContent);
+    console.log("抽出された要素\n" + sceneContent);
     // containerに各要素を追加
     const elements = document.createElement('div');
     elements.innerHTML = sceneContent.trim();
