@@ -1,7 +1,7 @@
 <html>
   <head>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="ElementsExtractor.js"></script>
+    <script src="../ElementsExtractor.js"></script>
     <script type="text/javascript">
       let API_KEY = '';
       let elmContainer;
@@ -15,10 +15,9 @@
         outputText=document.getElementById('output');
         //ChatGPTに送信するメッセージ。system:システムの役割、user:指示内容。
         messageArray=[
-          {role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるアシスタントです。"},
-          {role: "user", content: "今日はよろしくお願いします。"}
+          {role: "system", content: "あなたA-Frameバージョン1.4.0以降のPrimitive Elementのタグを教えるアシスタントです。"},
+          {role: "user", content: "ボタンクリックのタイミングでここに命令が代入されます"}
         ];
-        SendMessage();
       }
       //ChatGPTにメッセージを送信
       async function SendMessage() {
@@ -47,12 +46,10 @@
       }else{
         text="No Response";
       }
-      outputText.value=(text+"\n\n");
       return text;
     }
     //ChatGPTからの回答からA-Frameの要素を抽出
     function CreateElements(text){
-      console.log("処理開始\n");
       //結果を表示する準備
       outputText.value+="[処理結果]\n";
       //textからA-Frameの要素を抽出
@@ -86,6 +83,8 @@
       messageArray[1]={role: "user", content: prompt};
       //ChatGPTにメッセージを送信
       let result = await SendMessage();
+      //ChatGPTからの回答を表示
+      outputText.value=(result+"\n\n");
       //ChatGPTからの回答からA-Frameの要素を抽出
       CreateElements(result); 
     }

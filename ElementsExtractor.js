@@ -1,4 +1,5 @@
 function FindAframeElements(text) {
+    console.log("Start to fine A-Frame Elements\n"); 
     let generatedElements = [];
     // <a-scene> と </a-scene> タグの間の内容、または全体の内容を抽出する正規表現
     const regex = /```(?:html)?\s*([\s\S]*?)```/g;

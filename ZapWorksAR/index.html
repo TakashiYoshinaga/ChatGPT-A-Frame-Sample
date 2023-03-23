@@ -18,7 +18,7 @@
         outputText.value="上のTextAreaに指示を入力してください";
         //ChatGPTに送信するメッセージ。初期値はシステムの役割
         messageArray=[
-          {role: "system", content: "あなたA-Frameバージョン1.3.0以降のPrimitive Elementのタグを教えるアシスタントです。"}
+          {role: "system", content: "あなたA-Frameバージョン1.4.0以降のPrimitive Elementのタグを教えるアシスタントです。"}
         ];
        
         let myImageGroup = document.getElementById("image-group");
@@ -71,14 +71,11 @@
           //ChatGPTからの回答がなければ、最後の要素を削除
           messageArray.pop();
         }
-        //結果を表示
-        outputText.value=(text+"\n\n");
         console.log(messageArray);
         return text;
       }
       //ChatGPTからの回答からA-Frameの要素を抽出
       function CreateElements(text){
-        console.log("処理開始\n");
         //textからA-Frameの要素を抽出
         let generatedElements = FindAframeElements(text);
         //generatedElementsが空でなければcontainerに各要素を追加
@@ -109,6 +106,8 @@
         messageArray.push({role: "user", content: prompt});
         //ChatGPTにメッセージを送信
         let result = await SendMessage();
+        //ChatGPTからの回答を表示
+        outputText.value=(result+"\n\n");
         //ChatGPTからの回答からA-Frameの要素を抽出
         CreateElements(result);
       }
