@@ -36,30 +36,31 @@
         });
         //レスポンスを受け取ったら、結果をjsonで取得
         let data = await response.json();
-        let text;
+        let result;
         //ChatGPTからの回答があればメッセージ履歴に追加
         if(data.choices){
           //ChatGPTからの回答をテキストで取得
-          text=data.choices[0].message.content;
+          result=data.choices[0].message.content;
           //ChatGPTからの回答をmessagesArrayに追加
-          messageArray.push({role: "assistant", content: text});
+          messageArray.push({role: "assistant", content: result});
           //messageArray.push(data.choices[0].message);//こっちでもOK
           //messagesArrayの要素数が11を超えたら、1番目と2番目の要素(0スタート)を削除
           if(messageArray.length>11){ 
             messageArray.splice(1,2);
           }
         }else{
-          text="No Response";
+          result="No Response";
           //ChatGPTからの回答がなければ、最後の要素を削除
           messageArray.pop();
         }    
         console.log(messageArray);
-        return text;
+        return result;
       }
       //ChatGPTからの回答からA-Frameの要素を抽出
       function CreateElements(text){ 
+        let result;
         //結果を表示する準備
-        outputText.value+="[処理結果]\n";
+        result="[処理結果]\n";
         //textからA-Frameの要素を抽出
         let generatedElements = FindAframeElements(text);
         //generatedElementsが空でなければcontainerに各要素を追加
@@ -72,12 +73,13 @@
           generatedElements.forEach(element => {
             //elementをcontainerに追加
             elmContainer.appendChild(element); 
-            //elementのタグをoutputTextに追加(表示用)
-            outputText.value += element.outerHTML + "\n";
+            //elementのタグをresultに追加(表示用)
+            result += element.outerHTML + "\n";
           });
         }else{
-          outputText.value += "No A-Frame primitive element found.\n";
+          result += "No A-Frame primitive element found.\n";
         } 
+        return result;
       }
       //ボタンが押されたら
       async function OnClick() {
@@ -94,7 +96,9 @@
         //ChatGPTからの回答を表示
         outputText.value=(result+"\n\n");
         //ChatGPTからの回答からA-Frameの要素を抽出
-        CreateElements(result);
+        result = CreateElements(result);
+        //抽出結果を表示
+        outputText.value+=result;
       }
     </script>
   </head>
