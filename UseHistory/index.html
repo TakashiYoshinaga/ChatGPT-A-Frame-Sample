@@ -18,6 +18,28 @@
           {role: "system", content: "あなたA-Frameバージョン1.4.0以降のPrimitive Elementのタグを教えるアシスタントです。"}
         ];
       }
+      //ボタンが押されたら
+      async function OnClick() {
+        outputText.value="Waiting...";
+        //プロンプトをTexAreaから取得
+        let prompt = document.getElementById('input').value;
+        //promptがない場合
+        if (!prompt){outputText.value="プロンプトを入力してください"; return};
+        //プロンプトにオプションを追加
+        prompt="今のシーンに対して、" + prompt + "\n 上記を実現するA-Frameのa-から始まる要素を生成。\n ただしa-camera,a-assets,a-animation,a-lightは使用しない。\n scriptを使用しない。\n 背景の設定にbackgroundコンポーネントではなくa-sky>を使用。\n 結果はコードブロックに記述。";
+        //ChatGPTに送信するメッセージにプロンプトを追加
+        messageArray.push({role: "user", content: prompt});
+        //ChatGPTにメッセージを送信
+        let result = await SendMessage();
+        //ChatGPTからの回答を表示
+        outputText.value=(result+"\n\n");
+        //ChatGPTからの回答からA-Frameの要素を抽出
+        result = CreateElements(result);
+        //抽出結果を表示
+        outputText.value+=("抽出結果\n"+result);  
+        //Experimental: A-FrameのシーンのみをChatGPTからの回答として上書き
+        messageArray[messageArray.length-1]={role: "assistant", content: "```html\n<a-scene>\n "+elmContainer.innerHTML+"\n </a-scene>\n``` "};       
+      }
       //ChatGPTにメッセージを送信
       async function SendMessage() {
         //promptがある場合はリクエストを送信
@@ -77,26 +99,6 @@
           result += "No A-Frame primitive element found.\n";
         } 
         return result;
-      }
-      //ボタンが押されたら
-      async function OnClick() {
-        outputText.value="Waiting...";
-        //プロンプトをTexAreaから取得
-        let prompt = document.getElementById('input').value;
-        //promptがない場合
-        if (!prompt){outputText.value="プロンプトを入力してください"; return};
-        //プロンプトをmessageArrayに追加
-        prompt="今のシーンに対して、" + prompt + "\n 上記を実現するA-Frameのa-から始まる要素を生成。\n ただしa-camera,a-assets,a-animation,a-lightは使用しない。\n scriptを使用しない。\n 背景変更にbackgroundコンポーネントではなくa-skyを使用。\n 結果はコードブロックに記述。";        messageArray.push({role: "user", content: prompt});
-        //ChatGPTにメッセージを送信
-        let result = await SendMessage();
-        //ChatGPTからの回答を表示
-        outputText.value=(result+"\n\n");
-        //ChatGPTからの回答からA-Frameの要素を抽出
-        result = CreateElements(result);
-        //抽出結果を表示
-        outputText.value+=("抽出結果\n"+result);  
-        //Experimental: A-FrameのシーンのみをChatGPTからの回答として上書き
-        messageArray[messageArray.length-1]={role: "assistant", content: "```html\n<a-scene>\n "+elmContainer.innerHTML+"\n </a-scene>\n``` "};       
       }
     </script>
   </head>
