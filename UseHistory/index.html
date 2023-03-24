@@ -58,11 +58,10 @@
       }
       //ChatGPTからの回答からA-Frameの要素を抽出
       function CreateElements(text){ 
-        let result;
-        //結果を表示する準備
-        result="[処理結果]\n";
         //textからA-Frameの要素を抽出
         let generatedElements = FindAframeElements(text);
+        //resultに各要素のタグを追加
+        let result=generatedElements.map(element => element.outerHTML).join("\n");
         //generatedElementsが空でなければcontainerに各要素を追加
         if(generatedElements.length>0){
           //containerから子要素を削除
@@ -73,8 +72,6 @@
           generatedElements.forEach(element => {
             //elementをcontainerに追加
             elmContainer.appendChild(element); 
-            //elementのタグをresultに追加(表示用)
-            result += element.outerHTML + "\n";
           });
         }else{
           result += "No A-Frame primitive element found.\n";
@@ -97,7 +94,7 @@
         //ChatGPTからの回答からA-Frameの要素を抽出
         result = CreateElements(result);
         //抽出結果を表示
-        outputText.value+=result;  
+        outputText.value+=("抽出結果\n"+result);  
         //Experimental: A-FrameのシーンのみをChatGPTからの回答として上書き
         messageArray[messageArray.length-1]={role: "assistant", content: "```html\n<a-scene>\n "+elmContainer.innerHTML+"\n </a-scene>\n``` "};       
       }
@@ -107,8 +104,8 @@
     <a-scene>
       <a-entity id="container"></a-entity>
     </a-scene>
-    <div style="position: fixed; top: 20px; left: 20px; width: 20%;">
-      <textarea id="input" style="font-size: 20px; width: 100%; height: 250px;"></textarea>
+    <div style="position: fixed; top: 20px; left: 20px; width: 35%;">
+      <textarea id="input" style="font-size: 20px; width: 100%; height: 80px;"></textarea>
       <button onclick="OnClick()" style="display: block; margin: 10px 0; width: 100%; height: 50px;">Submit</button>
       <textarea id="output" style="font-size: 18px; width: 100%; height: 250px;"></textarea>
     </div>

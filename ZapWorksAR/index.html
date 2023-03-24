@@ -76,9 +76,10 @@
       }
       //ChatGPTからの回答からA-Frameの要素を抽出
       function CreateElements(text){
-        let result="";
         //textからA-Frameの要素を抽出
         let generatedElements = FindAframeElements(text);
+        //resultに各要素のタグを追加
+        let result="";//generatedElements.map(element => element.outerHTML).join("\n");
         //generatedElementsが空でなければcontainerに各要素を追加
         if(generatedElements.length>0){
           //containerから子要素を削除
@@ -89,7 +90,6 @@
           generatedElements.forEach(element => {
             //elementをcontainerに追加
             elmContainer.appendChild(element); 
-            //result += element.outerHTML + "\n";
           });
         }else{
           result += "No A-Frame primitive element found.\n";
