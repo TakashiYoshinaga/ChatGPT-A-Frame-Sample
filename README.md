@@ -1,4 +1,4 @@
-# ChatGPT-A-Frame-Sample
+# ChatGPT x A-Frame-Sample
 
 ## Demo
 You can experience this demo (recommended for use on a PC).<br>
