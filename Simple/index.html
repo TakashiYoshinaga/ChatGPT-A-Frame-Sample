@@ -7,6 +7,8 @@
       let elmContainer;
       let outputText;
       let messageArray;
+      //isEnglish=true: English, false: Japanese
+      const isEnglish = true;
 
       window.onload=function(){
         //A-Frameのオブジェクトの追加先
@@ -14,10 +16,19 @@
         //ChatGPTからの回答を表示するテキストエリア
         outputText=document.getElementById('output');
         //ChatGPTに送信するメッセージ。system:システムの役割、user:指示内容。
-        messageArray=[
-          {role: "system", content: "あなたA-Frameバージョン1.4.0以降のPrimitive Elementのタグを教えるアシスタントです。"},
-          {role: "user", content: "OnClick()でここに命令が代入されます"}
-        ];
+        if(isEnglish){
+          //initiliaze messageArray in English
+          messageArray=[
+            {role: "system", content: "You are an assistant that teaches me Primitive Element tags for A-Frame version 1.4.0 and later."},
+            {role: "user", content: "This prompt will be replaced with text of input area when OnClick() is called"}
+          ];
+        }else{
+          //initiliaze messageArray in Japanese
+          messageArray=[
+            {role: "system", content: "あなたA-Frameバージョン1.4.0以降のPrimitive Elementのタグを教えるアシスタントです。"},
+            {role: "user", content: "OnClick()でここに命令が代入されます"}
+          ];
+        }
       }
       //ボタンが押されたら
       async function OnClick() {
@@ -29,18 +40,33 @@
         //プロンプトをTexAreaから取得
         let prompt = document.getElementById('input').value;
         //promptがない場合
-        if (!prompt){outputText.value="プロンプトを入力してください"; return};
+        if (!prompt){outputText.value="Enter a prompt"; return};
         //プロンプトをmessageArrayに追加
-        prompt+="\n 上記を実現するA-Frameのa-から始まる要素を生成。\n ただしa-camera,a-assets,a-animation,a-lightは使用しない。\n scriptを使用しない。\n 背景の設定にbackgroundコンポーネントではなくa-sky>を使用。\n 結果はコードブロックに記述。";
+        if(isEnglish){
+          prompt += 
+          `Create an A-Frame element that starts with 'a-' to achieve the prompt above. Please follow these conditions:
+          - Do not use a-camera, a-assets, a-animation, or a-light.
+          - Avoid using scripts.
+          - Instead of the background component, use the a-sky element for background settings.
+          - Please provide the result in a code block.`;
+        }
+        else{
+          prompt+=
+          `上記を実現するA-Frameのa-から始まる要素を生成。ただし下記の条件を満たすこと。
+          - a-camera,a-assets,a-animation,a-lightは使用しない。
+          - scriptを使用しない。
+          - 背景の設定にbackgroundコンポーネントではなくa-sky>を使用。
+          - 結果はコードブロックに記述。`;
+        }
         messageArray[1]={role: "user", content: prompt};
         //ChatGPTにメッセージを送信
         let result = await SendMessage();
         //ChatGPTからの回答を表示
-        outputText.value=(result+"\n\n");
+        outputText.value=("[Response]\n"+result+"\n\n");
         //ChatGPTからの回答からA-Frameの要素を抽出
         result = CreateElements(result); 
         //ChatGPTからの回答からA-Frameの要素を抽出した結果を表示
-        outputText.value+=("抽出結果\n"+result);
+        outputText.value+=("[Extracted Elements]\n"+result);
       }
       //API Keyを入力
       function SetAPIKey(){
@@ -91,7 +117,7 @@
       //textからA-Frameの要素を抽出
       let generatedElements = FindAframeElements(text);
       //resultに各要素のタグを追加
-      let resultresult=generatedElements.map(element => element.outerHTML).join("\n");
+      let result=generatedElements.map(element => element.outerHTML).join("\n");
       //generatedElementsが空でなければcontainerに各要素を追加
       if(generatedElements.length>0){
         //containerから子要素を削除
@@ -116,9 +142,9 @@
     </a-scene>
     <div style="position: fixed; top: 20px; left: 20px; width: 35%;">
       <textarea id="apikey" style="display: block; margin: 10px 0;font-size: 18px; width: 100%; height: 30px; white-space: nowrap;">Enter Your API Key</textarea>
-      <textarea id="input" style="display: block; font-size: 18px; width: 100%; height: 80px;">プロンプトを入力してください</textarea>
+      <textarea id="input" style="display: block; font-size: 18px; width: 100%; height: 80px;">Enter a prompt</textarea>
       <button onclick="OnClick()" style="display: block; margin: 10px 0; width: 100%; height: 50px;">Submit</button>
-      <textarea id="output" style="display: block; font-size: 18px; width: 100%; height: 250px;">結果が表示されます</textarea>
+      <textarea id="output" style="display: block; font-size: 18px; width: 100%; height: 250px;"></textarea>
     </div>
   </body>
 </html>

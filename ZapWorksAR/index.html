@@ -9,18 +9,26 @@
       let elmContainer;
       let outputText;
       let messageArray;
+      //isEnglish=true: English, false: Japanese
+      const isEnglish = true;
 
       window.onload=function(){
         //A-Frameのオブジェクトの追加先
         elmContainer = document.getElementById('container');
         //ChatGPTからの回答を表示するテキストエリア
         outputText=document.getElementById('output');
-        outputText.value="上のTextAreaに指示を入力してください";
         //ChatGPTに送信するメッセージ。初期値はシステムの役割
-        messageArray=[
-          {role: "system", content: "あなたA-Frameバージョン1.4.0以降のPrimitive Elementのタグを教えるアシスタントです。"}
-        ];
-       
+        if(isEnglish){
+          //initiliaze messageArray in English
+          messageArray=[
+            {role: "system", content: "You are an assistant that teaches me Primitive Element tags for A-Frame version 1.4.0 and later."}
+          ];
+        }else{
+          //initiliaze messageArray in Japanese
+          messageArray=[
+            {role: "system", content: "あなたA-Frameバージョン1.4.0以降のPrimitive Elementのタグを教えるアシスタントです。"}
+          ];
+        }  
         let myImageGroup = document.getElementById("image-group");
         let imageVisible = false;
         myImageGroup.addEventListener("zappar-visible", () => {
@@ -44,18 +52,33 @@
         let prompt = document.getElementById('input').value;
         //promptがない場合
         if (!prompt){outputText.value="プロンプトを入力してください"; return};
-        //メッセージに詳細を追加
-        prompt="今のシーンに対して、" + prompt + "\n 上記を実現するA-Frameのa-から始まる要素を生成。\n ただしa-camera,a-assets,a-animation,a-lightは使用しない。\n scriptを使用しない。\n 背景の設定にbackgroundコンポーネントではなくa-sky>を使用。\n 結果はコードブロックに記述。";
+        //プロンプトにオプションを追加
+        if(isEnglish){
+          prompt += 
+          `Create an A-Frame element that starts with 'a-' to achieve the prompt above. Please follow these conditions:
+          - Consider the current scene.
+          - Do not use a-camera, a-assets, a-animation, a-sky or a-light.
+          - Avoid using scripts.
+          - Please provide the result in a code block.`;
+        }
+        else{
+          prompt+=
+          `上記を実現するA-Frameのa-から始まる要素を生成。ただし下記の条件を満たすこと。
+          - 現在のシーンを踏まえること。
+          - a-camera,a-assets,a-animation, a-sky,a-lightは使用しない。
+          - scriptを使用しない。
+          - 結果はコードブロックに記述。`;
+        }
         //promptをmessageArrayに追加
         messageArray.push({role: "user", content: prompt});
         //ChatGPTにメッセージを送信
         let result = await SendMessage();
         //ChatGPTからの回答を表示
-        outputText.value=(result+"\n\n");
+        outputText.value=("[Response]\n"+result+"\n\n");
         //ChatGPTからの回答からA-Frameの要素を抽出
         result = CreateElements(result);
         //A-Frameの要素を表示
-        outputText.value+=result;
+        outputText.value+=("[Extracted Elements]\n"+result); 
         //Experimental: A-FrameのシーンのみをChatGPTからの回答として上書き
         messageArray[messageArray.length-1]={role: "assistant", content: "```html\n<a-scene>\n "+elmContainer.innerHTML+"\n </a-scene>\n``` "};       
       }
@@ -134,7 +157,7 @@
         </a-entity>
     </a-scene>
     <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%;">
-      <textarea id="input" style="font-size: 20px; width: 100%; height: 70px;"></textarea>
+      <textarea id="input" style="font-size: 20px; width: 100%; height: 70px;">Enter a prompt</textarea>
       <button onclick="OnClick()" style="display: block; margin: 10px 0; width: 100%; height: 50px;">Submit</button>
       <textarea id="output" style="font-size: 18px; width: 100%; height: 70px;"></textarea>
     </div>
