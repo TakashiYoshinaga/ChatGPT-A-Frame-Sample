@@ -11,11 +11,11 @@
       const isEnglish = true;
 
       window.onload=function(){
-        //A-Frameのオブジェクトの追加先
+        //Element to add A-Frame object
         elmContainer = document.getElementById('container');
-        //ChatGPTからの回答を表示するテキストエリア
+        //Text area to display the answer from ChatGPT
         outputText=document.getElementById('output');
-        //ChatGPTに送信するメッセージ。system:システムの役割
+        //Initialize messageArray to be sent to ChatGPT
         if(isEnglish){
           //initiliaze messageArray in English
           messageArray=[
@@ -28,18 +28,18 @@
           ];
         }
       }
-      //ボタンが押されたら
+      //Called when the button is clicked
       async function OnClick() {
-        //API Keyを入力
+        //Set API Key
         SetAPIKey();
         if(!API_KEY){return};
-        //ChatGPTからの回答を表示するテキストエリアを初期化
+        //Initialize the text area to display the answer from ChatGPT
         outputText.value="Waiting for response...";
-        //プロンプトをTexAreaから取得
+        //Get prompt from TextArea
         let prompt = document.getElementById('input').value;
-        //promptがない場合
+        //Return if prompt is empty.
         if (!prompt){outputText.value="Enter a prompt"; return};
-        //プロンプトにオプションを追加
+        //Add options to prompt
         if(isEnglish){
           prompt += 
           `Create an A-Frame element that starts with 'a-' to achieve the prompt above. Please follow these conditions:
@@ -58,20 +58,21 @@
           - 背景の設定にbackgroundコンポーネントではなくa-sky>を使用。
           - 結果はコードブロックに記述。`;
         }
-        //ChatGPTに送信するメッセージにプロンプトを追加
+        //Add prompt to messageArray to be sent to ChatGPT
         messageArray.push({role: "user", content: prompt});
         //ChatGPTにメッセージを送信
+        //Send message to ChatGPT and get the answer.
         let result = await SendMessage();
-        //ChatGPTからの回答を表示
+        //Display the answer from ChatGPT
         outputText.value=("[Response]\n"+result+"\n\n");
-        //ChatGPTからの回答からA-Frameの要素を抽出
+        //Extract A-Frame elements from the answer from ChatGPT and add them to the scene
         result = CreateElements(result);
-        //抽出結果を表示
+        //Display the extracted elements as text
         outputText.value+=("[Extracted Elements]\n"+result);  
-        //Experimental: A-FrameのシーンのみをChatGPTからの回答として上書き
+        //Experimental: Overwriting only the A-Frame scene as the answer from ChatGPT
         messageArray[messageArray.length-1]={role: "assistant", content: "```html\n<a-scene>\n "+elmContainer.innerHTML+"\n </a-scene>\n``` "};       
       }
-      //API Keyを入力
+      //SET API KEY from TextArea
       function SetAPIKey(){
         let apikeyTextArea=document.getElementById('apikey');
         var key = apikeyTextArea.value;
@@ -86,9 +87,9 @@
           apikeyTextArea.style.display="none";
         }  
       }
-      //ChatGPTにメッセージを送信
+      //Send message to ChatGPT and get the answer.
       async function SendMessage() {
-        //promptがある場合はリクエストを送信
+        //Send message to ChatGPT
         let response = await fetch('https://api.openai.com/v1/chat/completions', 
         {
           method: 'POST',
@@ -102,43 +103,43 @@
             temperature:0.3,
           }),
         });
-        //レスポンスを受け取ったら、結果をjsonで取得
+        //Get the result as json from response
         let data = await response.json();
+        //Variable to store the answer from ChatGPT
         let result;
-        //ChatGPTからの回答があればメッセージ履歴に追加
+        //Add the answer from ChatGPT to messageArray if it exists.
         if(data.choices){
-          //ChatGPTからの回答をテキストで取得
+          //Get the answer from ChatGPT as text and store it in result
           result=data.choices[0].message.content;
-          //ChatGPTからの回答をmessagesArrayに追加
+          //Add the answer from ChatGPT to messageArray
           messageArray.push({role: "assistant", content: result});
           //messageArray.push(data.choices[0].message);//こっちでもOK
-          //messagesArrayの要素数が11を超えたら、1番目と2番目の要素(0スタート)を削除
+          //Delete the first two elements of messageArray if it has more than 11 elements.(index starts from 0)
           if(messageArray.length>11){ 
             messageArray.splice(1,2);
           }
         }else{
           result="No Response";
-          //ChatGPTからの回答がなければ、最後の要素を削除
+          //Delete the last element of messageArray if ChatGPT does not respond.
           messageArray.pop();
         }    
         console.log(messageArray);
         return result;
       }
-      //ChatGPTからの回答からA-Frameの要素を抽出
+      //Extract A-Frame elements from the answer from ChatGPT and add them to the scene
       function CreateElements(text){ 
-        //textからA-Frameの要素を抽出
+        //Extract A-Frame elements from text (text is the answer from ChatGPT)
         let generatedElements = FindAframeElements(text);
-        //resultに各要素のタグを追加
+        //Add each element's tag to result as string (result is the text to be displayed in the text area)
         let result=generatedElements.map(element => element.outerHTML).join("\n");
-        //generatedElementsが空でなければcontainerに各要素を追加
+        //Add each element to container if generatedElements is not empty.
         if(generatedElements.length>0){
-          //containerから子要素を削除
+          //Remove all child elements from container
           while (elmContainer.firstChild) {
             elmContainer.removeChild(elmContainer.firstChild);
           }
-          //containerに各要素を追加
+          //Add each new element to container
           generatedElements.forEach(element => {
-            //elementをcontainerに追加
             elmContainer.appendChild(element); 
           });
         }else{
