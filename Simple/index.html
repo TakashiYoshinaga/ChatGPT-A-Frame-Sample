@@ -43,20 +43,24 @@
         if (!prompt){outputText.value="Enter a prompt"; return};
         //Add options to prompt
         if(isEnglish){
-          prompt += 
-          `Create an A-Frame element that starts with 'a-' to achieve the prompt above. Please follow these conditions:
+          prompt = 
+          `Generate A-Frame elements starting with 'a-' to accomplish the following instruction while meeting the condition below.
+          condition:"""
           - Do not use a-camera, a-assets, a-animation, or a-light.
           - Avoid using scripts.
           - Instead of the background component, use the a-sky element for background settings.
-          - Please provide the result in a code block.`;
+          - Please provide the result in one code block."""
+          instruction:"""`+prompt+`"""`;
         }
         else{
-          prompt+=
-          `上記を実現するA-Frameのa-から始まる要素を生成。ただし下記の条件を満たすこと。
+          prompt =
+          `下記の指示を実現するA-Frameのa-から始まる要素を生成。ただし下記の条件を満たすこと。
+          条件:"""
           - a-camera,a-assets,a-animation,a-lightは使用しない。
           - scriptを使用しない。
           - 背景の設定にbackgroundコンポーネントではなくa-sky>を使用。
-          - 結果はコードブロックに記述。`;
+          - 結果はコードブロックに記述。"""
+          指示： """`+prompt+`"""`;
         }
         //Add prompt to messageArray to be sent to ChatGPT
         messageArray[1]={role: "user", content: prompt};
