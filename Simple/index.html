@@ -84,7 +84,7 @@
           apikeyTextArea.style.display="none";
         }  
       }
-      //ChatGPTにメッセージを送信
+      //Send message to ChatGPT and get the answer.
       async function SendMessage() {
         //Send message to ChatGPT
         let response = await fetch('https://api.openai.com/v1/chat/completions', 

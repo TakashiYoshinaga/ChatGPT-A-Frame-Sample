@@ -60,7 +60,6 @@
         }
         //Add prompt to messageArray to be sent to ChatGPT
         messageArray.push({role: "user", content: prompt});
-        //ChatGPTにメッセージを送信
         //Send message to ChatGPT and get the answer.
         let result = await SendMessage();
         //Display the answer from ChatGPT
