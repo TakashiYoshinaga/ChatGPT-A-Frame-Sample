@@ -1,3 +1,5 @@
+// Copyright (c) Takashi Yoshinaga
+// This software is released under the MIT License.
 function FindAframeElements(text) {
     console.log("Start to find A-Frame Elements\n"); 
     let generatedElements = [];
