@@ -1,0 +1,127 @@
+<!-- Copyright (c) Takashi Yoshinaga -->
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="ElementsExtractor.js"></script>
+    <script type="text/javascript">
+      let API_KEY = '';
+      let elmContainer; //A-Frameのオブジェクトの追加先
+      let outputText;  //ChatGPTからの回答を表示するテキストエリア
+      let messageArray; //ChatGPTとのやりとりを記録する配列。
+      //初期化
+      window.onload=function(){
+        //A-Frameのオブジェクトの追加先
+        elmContainer = document.getElementById('container');
+        //ChatGPTからの回答を表示するテキストエリア
+        outputText=document.getElementById('output');
+        //ChatGPTに送信するメッセージ。system:システムの役割、user:指示
+        messageArray=[
+            {role: "system", content: "あなたA-Frameバージョン1.4.0以降のPrimitive Elementのタグを教えるアシスタントです。"},
+        ];   
+      }
+      //ボタンを押した時の挙動
+      async function OnClick() {
+        //ChatGPTからの回答を表示するテキストエリアを初期化
+        outputText.value="Waiting for response...";  
+        //テキストエリアからプロンプトを取得
+        let prompt = document.getElementById('input').value;
+        //プロンプトが空の場合、処理を終了
+        if (!prompt){outputText.value="プロンプトを入力してください"; return};
+        //プロンプトにオプションを追加
+        prompt =
+          `下記の指示を実現するA-Frameのa-から始まる要素を生成。ただし下記の条件を満たすこと。
+          条件:"""
+          - a-camera,a-assets,a-animation,a-lightは使用しない。
+          - scriptを使用しない。
+          - 背景の設定にbackgroundコンポーネントではなくa-sky>を使用。
+          - 結果は1つのコードブロックに記述。"""
+          指示： """`+prompt+`"""`;
+        //ChatGPTに送信するメッセージにプロンプトをセット
+        messageArray.push({role: "user", content: prompt});
+        //ChatGPTにメッセージを送信して、回答を取得
+        let result = await SendMessage();
+        //ChatGPTからの回答をテキストエリアに表示
+        outputText.value=("[ChatGPTの回答]\n"+result+"\n\n");
+        //ChatGPTからの回答からA-Frameのオブジェクトを抽出して、シーンに追加
+        result = CreateElements(result); 
+        //ChatGPTからの回答から抽出したA-Frameのオブジェクトをテキストエリアに表示
+        outputText.value+=("[抽出された要素]\n"+result);
+        //ChatGPTからの回答をA-Frameのシーンに関連するものだけに上書き
+        messageArray[messageArray.length-1]={role: "assistant", content: "```html\n<a-scene>\n "+elmContainer.innerHTML+"\n </a-scene>\n``` "};   
+      }
+      //ChatGPTにメッセージを送信して、回答を取得
+      async function SendMessage() {
+        //ChatGPTにメッセージを送信
+        let response = await fetch('https://api.openai.com/v1/chat/completions', 
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${API_KEY}`,
+            },
+            body: JSON.stringify({
+              model: "gpt-3.5-turbo",
+              messages: messageArray, 
+              temperature:0.3,
+              }
+            ),
+          }
+        );
+      //ChatGPTからの回答をjson形式で取得
+      let data = await response.json();
+      //ChatGPTからの回答を格納する変数
+      let result=JSON.stringify(data);
+      //ChatGPTからレスポンスがあったかどうかを判定
+      if(data.choices){
+        //ChatGPTからの回答をテキスト形式で取得してresultに格納
+        result=data.choices[0].message.content;
+        //ChatGPTからの回答をmessageArrayに追加
+        messageArray.push({role: "assistant", content: result});
+        //messageArrayが9個を超えた場合、最初の2つの要素を削除
+        if(messageArray.length>9){ 
+          messageArray.splice(1,2);
+        }
+      }else{
+        //ChatGPTからレスポンスがなかった場合、No Responseと返す。
+        result="No Response";
+        //ChatGPTからレスポンスがなかった場合、messageArrayの最後の質問を削除
+        messageArray.pop();
+      }
+      return result;
+    }
+    //ChatGPTからの回答からA-Frameのオブジェクトを抽出して、シーンに追加
+    function CreateElements(text){  
+      //ChatGPTからの回答からA-Frameのオブジェクトを抽出(引数textはChatGPTからの回答)
+      let generatedElements = FindAframeElements(text);
+      //A-Frameのオブジェクトのタグを文字列化してresultに追加(TextAreaでの表示用)
+      let result=generatedElements.map(element => element.outerHTML).join("\n");
+      //A-Frameのオブジェクトがある場合はオブジェクトをシーンに追加
+      if(generatedElements.length>0){
+        //シーンからすべてのオブジェクトを削除
+        while (elmContainer.firstChild) {
+          elmContainer.removeChild(elmContainer.firstChild);
+        }
+        //A-Frameのオブジェクトを1つずつシーンに追加
+        generatedElements.forEach(element => {
+          elmContainer.appendChild(element); 
+        });
+      }else{
+        result = "No A-Frame primitive element found.\n";
+      }
+      return result;
+    }
+    </script>
+  </head>
+  <body>
+    <!-- A-Frameのシーン -->
+    <a-scene>
+      <a-entity id="container"></a-entity>
+    </a-scene>
+    <!-- テキストエリアとボタン -->
+    <div style="position: fixed; top: 20px; left: 20px; width: 35%;">
+      <textarea id="input" style="display: block; font-size: 18px; width: 100%; height: 80px;"></textarea>
+      <button onclick="OnClick()" style="display: block; margin: 10px 0; width: 100%; height: 50px;">Submit</button>
+      <textarea id="output" style="display: block; font-size: 18px; width: 100%; height: 250px;"></textarea>
+    </div>
+  </body>
+</html>
