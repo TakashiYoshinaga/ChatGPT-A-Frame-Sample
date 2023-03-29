@@ -8,6 +8,7 @@
       let elmContainer;
       let outputText;
       let messageArray;
+      let prevScene = "```html\n<a-scene>\n\n</a-scene>\n``` ";
       //isEnglish=true: English, false: Japanese
       const isEnglish = true;
 
@@ -43,25 +44,31 @@
         //Add options to prompt
         if(isEnglish){
           prompt = 
-          `Generate A-Frame elements starting with 'a-' to accomplish the following instruction while meeting the condition below.
-          condition:"""
+          `Add or modify A-Frame elements starting with 'a-' in the code to accomplish the following instruction while meeting the conditions below.\n`
+          +`code:\n`+prevScene+`\n`
+          +`condition:\n"""
           - Consider the current scene.
-          - Do not use a-camera, a-assets, a-animation, or a-light.
+          - Do not use a-camera, a-assets, or a-light.
           - Avoid using scripts.
-          - Instead of the background component, use the a-sky element for background settings.
-          - Please provide the result in one code block."""
-          instruction:"""`+prompt+`"""`;
+          - If animation setting is requested, use the animation component instead of the <a-animation> element.
+          - If background setting is requested, use the <a-sky> element instead of the background component.
+          - Make sure that an <a-sky> element is present in the scene.
+          - Please provide the result in one code block.\n"""\n`
+          + `instruction:\n"""\n`+prompt+`\n"""`;
         }
         else{
           prompt =
-          `下記の指示を実現するA-Frameのa-から始まる要素を生成。ただし下記の条件を満たすこと。
-          条件:"""
+          `下記の指示を実現するA-Frameのa-から始まる要素をコードに追加・修正。ただし下記の条件を満たすこと。\n`
+          +`コード：\n`+prevScene+`\n`
+          +`条件:\n"""
           - 現在のシーンを踏まえること。
-          - a-camera,a-assets,a-animation,a-lightは使用しない。
+          - a-camera,a-assets,a-lightは使用しない。
           - scriptを使用しない。
-          - 背景の設定にbackgroundコンポーネントではなくa-sky>を使用。
-          - 結果はコードブロックに記述。"""
-          指示： """`+prompt+`"""`;
+          - アニメーションの設定を要求された場合は、<a-animation>ではなくanimationコンポーネントを使用。
+          - 背景の設定を要求された場合は、backgroundコンポーネントではなくa-sky>を使用。
+          - 必ず<a-sky>はシーンに存在させる。
+          - 結果はコードブロックに記述。\n"""\n`
+          + `指示：\n"""\n`+prompt+`\n"""`;
         }
         //Add prompt to messageArray to be sent to ChatGPT
         messageArray.push({role: "user", content: prompt});
@@ -72,9 +79,11 @@
         //Extract A-Frame elements from the answer from ChatGPT and add them to the scene
         result = CreateElements(result);
         //Display the extracted elements as text
-        outputText.value+=("[Extracted Elements]\n"+result);  
+        outputText.value+=("[Extracted Elements]\n"+result);
+        //Keep the current scene to be used as a prompt for the next instruction
+        prevScene = "```html\n<a-scene>\n "+elmContainer.innerHTML+"\n </a-scene>\n``` ";    
         //Experimental: Overwriting only the A-Frame scene as the answer from ChatGPT
-        messageArray[messageArray.length-1]={role: "assistant", content: "```html\n<a-scene>\n "+elmContainer.innerHTML+"\n </a-scene>\n``` "};       
+        messageArray[messageArray.length-1]={role: "assistant", content: prevScene};       
       }
       //SET API KEY from TextArea
       function SetAPIKey(){
@@ -118,8 +127,8 @@
           //Add the answer from ChatGPT to messageArray
           messageArray.push({role: "assistant", content: result});
           //messageArray.push(data.choices[0].message);//こっちでもOK
-          //Delete the first two elements of messageArray if it has more than 11 elements.(index starts from 0)
-          if(messageArray.length>11){ 
+          //Delete the first two elements of messageArray if it has more than 7 elements.(index starts from 0)
+          if(messageArray.length>7){ 
             messageArray.splice(1,2);
           }
         }else{
