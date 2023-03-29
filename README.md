@@ -12,7 +12,7 @@ https://platform.openai.com/signup
 This is the simplest sample to achieve one round-trip conversation with ChatGPT. <br>
 (previous context is not taken into account).
 ### KeepPreviousScene
-This is a sample that uses previous scene information when sending prompt.
+This is a sample that uses previous scene information when sending a prompt.
 ### KeepChatHistory
 This is a sample that uses a response that takes into account several rounds of conversation with ChatGPT
 ### ZapWorksAR
