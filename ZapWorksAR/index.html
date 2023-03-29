@@ -121,8 +121,8 @@
           result=data.choices[0].message.content;
           //Add the answer from ChatGPT to messageArray
           messageArray.push({role: "assistant", content: result});
-          //Delete the first two elements of messageArray if it has more than 11 elements.(index starts from 0)
-          if(messageArray.length>11){ 
+          //Delete the first two elements of messageArray if it has more than 7 elements.(index starts from 0)
+          if(messageArray.length>7){ 
             messageArray.splice(1,2);
           }
         }else{
