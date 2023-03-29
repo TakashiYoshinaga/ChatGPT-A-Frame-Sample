@@ -11,10 +11,12 @@ https://platform.openai.com/signup
 ### Simple
 This is the simplest sample to achieve one round-trip conversation with ChatGPT. <br>
 (previous context is not taken into account).
-### UseHistory
+### KeepPreviousScene
+This is a sample that uses previous scene information when sending prompt.
+### KeepChatHistory
 This is a sample that uses a response that takes into account several rounds of conversation with ChatGPT
 ### ZapWorksAR
-Sample code to use the UseHistory demo in ZapWorks.
+Sample code to use the KeepChatHistory demo with ZapWorks.
 <br><br>
 ## Videos
 On PC<br>
